@@ -376,7 +376,6 @@ void WS2812_circle_task(void)
 
 void my_main(void)
 {
-
     led_gpio_init();
     led_pwm_init();
     mic_gpio_init();

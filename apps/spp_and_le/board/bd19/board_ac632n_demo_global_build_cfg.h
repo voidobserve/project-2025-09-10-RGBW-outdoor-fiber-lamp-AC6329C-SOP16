@@ -4,6 +4,7 @@
 /* 改文件只添加和isd_config.ini相关的配置，用以生成isd_config.ini */
 /* 其他不相关的配置请勿添加在改文件 */
 
+// #include "./board_config.h"
 #ifdef CONFIG_BOARD_AC632N_DEMO
 
 /* Following Macros Affect Periods Of Both Code Compiling And Post-build */
