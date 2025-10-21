@@ -869,7 +869,7 @@ void set_static_mode(u8 r, u8 g, u8 b)
     fc_effect.rgb.b = b;
     fc_effect.rgb.w = 0;
 
-    printf("r = %d, g = %d, b = %d", r, g, b);
+    // printf("r = %d, g = %d, b = %d", r, g, b);
 
     // #if LED_STRIP_RGBW
     //     if( fc_effect.rgb.r == 0xFF && \

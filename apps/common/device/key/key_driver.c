@@ -151,7 +151,6 @@ static void key_driver_scan(void *_scan_para)
     /* } */
 
     cur_key_value = scan_para->get_value();
- 
 
     /* if (cur_key_value != NO_KEY) { */
     /*     printf(">>>cur_key_value: %d\n", cur_key_value); */
@@ -481,7 +480,7 @@ int key_driver_init(void)
     // sys_hi_timer_add(NULL, RF24G_Key_Long_Scan, is_rf24g_._sacn_t);                         // 注册按键扫描定时器
 
     sys_s_hi_timer_add((void *)&rf24g_scan_para, key_driver_scan, rf24g_scan_para.scan_time); // 注册按键扫描定时器
-    // sys_s_hi_timer_add(NULL, rf24_key_handle, 1);
+    sys_s_hi_timer_add(NULL, rf24_key_handle, 1);                                             // 需要1ms调用一次，否则在调节色环时，颜色跳动会特别厉害
 #endif
 
 #if TCFG_IOKEY_ENABLE

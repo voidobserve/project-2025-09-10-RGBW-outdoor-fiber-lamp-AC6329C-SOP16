@@ -650,6 +650,7 @@ obj/Release/apps/common/device/key/key_driver.o
 -r=obj/Release/apps/common/device/key/key_driver.o,key_active_set,pl
 -r=obj/Release/apps/common/device/key/key_driver.o,key_driver_init,pl
 -r=obj/Release/apps/common/device/key/key_driver.o,usr_timer_add,l
+-r=obj/Release/apps/common/device/key/key_driver.o,rf24_key_handle,l
 -r=obj/Release/apps/common/device/key/key_driver.o,adkey_init,l
 -r=obj/Release/apps/common/device/key/key_driver.o,timer_get_ms,l
 -r=obj/Release/apps/common/device/key/key_driver.o,sys_event_notify,l
@@ -2402,13 +2403,21 @@ obj/Release/apps/user_app/rf24g_key/rf24g_key.o
 -r=obj/Release/apps/user_app/rf24g_key/rf24g_key.o,printf,l
 -r=obj/Release/apps/user_app/rf24g_key/rf24g_key.o,soft_turn_on_the_light,l
 -r=obj/Release/apps/user_app/rf24g_key/rf24g_key.o,soft_turn_off_lights,l
+-r=obj/Release/apps/user_app/rf24g_key/rf24g_key.o,set_static_mode,l
+-r=obj/Release/apps/user_app/rf24g_key/rf24g_key.o,ls_add_bright,l
+-r=obj/Release/apps/user_app/rf24g_key/rf24g_key.o,ls_sub_bright,l
+-r=obj/Release/apps/user_app/rf24g_key/rf24g_key.o,convert_key_val_to_rgb,pl
 -r=obj/Release/apps/user_app/rf24g_key/rf24g_key.o,chromatic_circle_val,pl
 -r=obj/Release/apps/user_app/rf24g_key/rf24g_key.o,rf24g_key_val,pl
 -r=obj/Release/apps/user_app/rf24g_key/rf24g_key.o,rf24g_key_event_table,pl
 -r=obj/Release/apps/user_app/rf24g_key/rf24g_key.o,rf24g_key_driver_event,pl
 -r=obj/Release/apps/user_app/rf24g_key/rf24g_key.o,rf24g_key_driver_value,pl
 -r=obj/Release/apps/user_app/rf24g_key/rf24g_key.o,rf24g_scan_para,pl
+-r=obj/Release/apps/user_app/rf24g_key/rf24g_key.o,chromatic_circle_table,pl
+-r=obj/Release/apps/user_app/rf24g_key/rf24g_key.o,zd_countdown,l
 -r=obj/Release/apps/user_app/rf24g_key/rf24g_key.o,rf24g_recv_info,pl
+-r=obj/Release/apps/user_app/rf24g_key/rf24g_key.o,color_index_cur,pl
+-r=obj/Release/apps/user_app/rf24g_key/rf24g_key.o,color_index_dest,pl
 obj/Release/apps/user_app/save_flash/save_flash.o
 -r=obj/Release/apps/user_app/save_flash/save_flash.o,read_flash_device_status_init,pl
 -r=obj/Release/apps/user_app/save_flash/save_flash.o,memset,l
@@ -2696,6 +2705,7 @@ obj/Release/apps/user_app/ws2812-fx-lib/WS2812FX_C/ws2812fx_effect.o
 -r=obj/Release/apps/user_app/ws2812-fx-lib/WS2812FX_C/ws2812fx_effect.o,fc_music_breath,pl
 -r=obj/Release/apps/user_app/ws2812-fx-lib/WS2812FX_C/ws2812fx_effect.o,fc_music_static,pl
 -r=obj/Release/apps/user_app/ws2812-fx-lib/WS2812FX_C/ws2812fx_effect.o,fc_music_twinkle,pl
+-r=obj/Release/apps/user_app/ws2812-fx-lib/WS2812FX_C/ws2812fx_effect.o,colorful_lights_static,pl
 -r=obj/Release/apps/user_app/ws2812-fx-lib/WS2812FX_C/ws2812fx_effect.o,music_trg,pl
 -r=obj/Release/apps/user_app/ws2812-fx-lib/WS2812FX_C/ws2812fx_effect.o,music_step,pl
 -r=obj/Release/apps/user_app/ws2812-fx-lib/WS2812FX_C/ws2812fx_effect.o,fc_effect,l
@@ -2710,6 +2720,8 @@ obj/Release/apps/user_app/ws2812-fx-lib/WS2812FX_C/ws2812fx_effect.o
 -r=obj/Release/apps/user_app/ws2812-fx-lib/WS2812FX_C/ws2812fx_effect.o,music_dly,pl
 -r=obj/Release/apps/user_app/ws2812-fx-lib/WS2812FX_C/ws2812fx_effect.o,music_s_m,pl
 -r=obj/Release/apps/user_app/ws2812-fx-lib/WS2812FX_C/ws2812fx_effect.o,ws2811fx_set_cycle,pl
+-r=obj/Release/apps/user_app/ws2812-fx-lib/WS2812FX_C/ws2812fx_effect.o,color_index_cur,l
+-r=obj/Release/apps/user_app/ws2812-fx-lib/WS2812FX_C/ws2812fx_effect.o,color_index_dest,l
 -r=obj/Release/apps/user_app/ws2812-fx-lib/WS2812FX_C/ws2812fx_effect.o,zd_countdown,l
 obj/Release/apps/user_app/ws2812-fx-lib/WS2812FX_C/ws2812fx_tool.o
 -r=obj/Release/apps/user_app/ws2812-fx-lib/WS2812FX_C/ws2812fx_tool.o,WS2812FX_color_wipe,pl
@@ -2766,7 +2778,6 @@ obj/Release/apps/spp_and_le/app_main.o
 -r=obj/Release/apps/spp_and_le/app_main.o,stepmotor,l
 -r=obj/Release/apps/spp_and_le/app_main.o,power_motor_Init,l
 -r=obj/Release/apps/spp_and_le/app_main.o,meteor_period_sub,l
--r=obj/Release/apps/spp_and_le/app_main.o,rf24_key_handle,l
 -r=obj/Release/apps/spp_and_le/app_main.o,os_time_dly,
 -r=obj/Release/apps/spp_and_le/app_main.o,WS2812_circle_task,pl
 -r=obj/Release/apps/spp_and_le/app_main.o,sound_handle,l

@@ -23,6 +23,8 @@ typedef enum
   IS_smear_adjust,  //涂抹功能
   
 
+  COLORFUL_LIGHTS_STATIC,
+
 } Now_state_e;
 
 //涂抹工具

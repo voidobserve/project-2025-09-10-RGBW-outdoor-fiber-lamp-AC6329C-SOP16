@@ -366,7 +366,8 @@ void main_while(void)
         meteor_period_sub(); // 流星周期控制
        
 
-        rf24_key_handle();
+        // rf24_key_handle();
+        // RF24G_Key_Handle();
         // printf("main circle\n");// 主循环约10ms
 
         os_time_dly(1);
