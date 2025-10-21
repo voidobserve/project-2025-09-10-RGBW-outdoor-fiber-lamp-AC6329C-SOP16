@@ -767,14 +767,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../common/third_party_profile/tuya_protocol/app/demo/tuya_ota.h" />
-		<Unit filename="../../../common/third_party_profile/tuya_protocol/app/product_test/tuya_ble_app_production_test.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../../common/third_party_profile/tuya_protocol/app/product_test/tuya_ble_app_production_test.h" />
-		<Unit filename="../../../common/third_party_profile/tuya_protocol/app/uart_common/tuya_ble_app_uart_common_handler.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../../common/third_party_profile/tuya_protocol/app/uart_common/tuya_ble_app_uart_common_handler.h" />
 		<Unit filename="../../../common/third_party_profile/tuya_protocol/extern_components/mbedtls/aes.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -928,6 +920,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../user_app/rf24g_key/rf24g_app.h" />
+		<Unit filename="../../../user_app/rf24g_key/rf24g_key.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../user_app/rf24g_key/rf24g_key.h" />
 		<Unit filename="../../../user_app/save_flash/save_flash.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -1251,10 +1247,6 @@
 		<Unit filename="board_ac632n_demo_cfg.h" />
 		<Unit filename="board_ac632n_demo_global_build_cfg.h" />
 		<Unit filename="board_config.h" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-			<debugger />
-		</Extensions>
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

@@ -9,6 +9,8 @@
 #include "led_strip_sys.h"
 #if (TCFG_RF24GKEY_ENABLE)
 
+
+#if 0
 /* ==============================================================
 
                 2.4g遥控初始化
@@ -277,7 +279,7 @@ void RF24G_Key_Handle(void)
 #if SUPPORT_LONG
 
         /* code */
-        if (key_value == TOUCHU_KEY_1)
+        if (key_value == 82)
         {
 
             if (is_rf24g_.long_press_cnt == 2)
@@ -292,5 +294,6 @@ void RF24G_Key_Handle(void)
 #endif
     }
 }
-
 #endif
+
+#endif // #if (TCFG_RF24GKEY_ENABLE)

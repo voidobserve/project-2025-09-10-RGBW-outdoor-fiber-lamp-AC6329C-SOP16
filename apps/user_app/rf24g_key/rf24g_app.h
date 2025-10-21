@@ -119,11 +119,11 @@ struct RF24G_PARA{
 
 
 
-extern rf24g_pair_t rf24g_pair[];        //需要写flash
-extern rf24g_ins_t rf24g_ins;
+// extern rf24g_pair_t rf24g_pair[];        //需要写flash
+// extern rf24g_ins_t rf24g_ins;
 
 
-void RF24G_Key_Handle(void);
+// void RF24G_Key_Handle(void);
 
 
 #endif

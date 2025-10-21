@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "board_ac6329c_demo_global_build_cfg.h": "c"
+        "board_ac6329c_demo_global_build_cfg.h": "c",
+        "rf24g_key.h": "c"
     }
 }

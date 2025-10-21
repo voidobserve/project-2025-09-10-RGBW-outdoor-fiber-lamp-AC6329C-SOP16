@@ -79,15 +79,15 @@ void soft_turn_on_the_light(void) // 软开灯处理
 
     fc_effect.on_off_flag = DEVICE_ON;
 
-    if (tk)
+    // if (tk)
     {
 
         OpenMortor();
     }
-    else
-    {
-        tk = 1;
-    }
+    // else
+    // {
+    //     tk = 1;
+    // }
 
     // motor_Init();
     // WS2812FX_start();
@@ -103,16 +103,18 @@ void soft_turn_on_the_light(void) // 软开灯处理
 void CloseMotor(void);
 void soft_turn_off_lights(void) // 软关灯处理
 {
-
     fc_effect.on_off_flag = DEVICE_OFF;
-    tk = 1; //
-    WS2812FX_stop();
-    WS2812FX_strip_off();
-    close_fan();
+    // tk = 1; //
+
     CloseMotor();
-    fb_led_on_off_state();  // 与app同步开关状态
+    
+    WS2812FX_stop();
+    WS2812FX_strip_off(); // 清空缓存
+    // close_fan();  
+    fb_led_on_off_state();  // 与app同步设备的开关状态
     save_user_data_area3(); // 保存参数配置到flash
-    printf("soft_turn_off_lights\n");
+
+    // printf("soft_turn_off_lights\n");
 }
 
 /*********************************************************
@@ -785,7 +787,7 @@ void CloseMotor(void)
 
     fc_effect.motor_on_off = DEVICE_OFF;
     one_wire_set_period(motor_period[fc_effect.star_speed_index]);
-    one_wire_set_mode(6); // 关闭电机
+    one_wire_set_mode(0x06); // 关闭电机
     enable_one_wire();    // 启动发送电机数据
 }
 
@@ -1128,8 +1130,7 @@ void ir_timer_handler(void)
 
 // 全彩效果初始化
 void full_color_init(void)
-{
-
+{ 
     WS2812FX_init(fc_effect.led_num, fc_effect.sequence); // 初始化ws2811
     WS2812FX_setBrightness(fc_effect.b);
     set_on_off_led(fc_effect.on_off_flag);
@@ -1137,7 +1138,7 @@ void full_color_init(void)
     extern void count_down_run(void);
     extern void time_clock_handler(void);
     sys_s_hi_timer_add(NULL, count_down_run, 10);     // 注册按键扫描定时器
-    sys_s_hi_timer_add(NULL, ir_timer_handler, 10);   // 注册按键扫描定时器
-    sys_s_hi_timer_add(NULL, time_clock_handler, 10); // 注册按键扫描定时器
+    // sys_s_hi_timer_add(NULL, ir_timer_handler, 10);   // 注册按键扫描定时器
+    // sys_s_hi_timer_add(NULL, time_clock_handler, 10); // 注册按键扫描定时器
     sys_s_hi_timer_add(NULL, meteor_period_sub, 10);  // 注册按键扫描定时器
 }

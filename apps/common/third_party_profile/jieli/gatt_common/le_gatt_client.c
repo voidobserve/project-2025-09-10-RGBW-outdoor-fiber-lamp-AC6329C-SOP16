@@ -41,6 +41,8 @@
 #define LOG_CLI_ENABLE
 #include "debug.h"
 
+#include "../../../../../apps/user_app/rf24g_key/rf24g_key.h"
+
 #if TCFG_USER_BLE_ENABLE && CONFIG_BT_GATT_COMMON_ENABLE
 
 /* #ifdef log_info */
@@ -1007,7 +1009,7 @@ static bool __check_device_is_match(u8 event_type, u8 info_type, u8 *data, int s
     return false;
 }
 
-#include "rf24g_app.h"
+// #include "rf24g_app.h"
 
 /*************************************************************************************************/
 /*!
@@ -1061,13 +1063,13 @@ static bool __resolve_adv_report(adv_report_t *report_pt, u16 len)
 
         #if TCFG_RF24GKEY_ENABLE
         rf24g_scan(adv_data_pt);
-        {
-            // rf24g_ins_t *p = (rf24g_ins_t *) adv_data_pt;
-            // if(p->header1 == HEADER1 && p->header2 == HEADER2)
-            // {
-            //     printf_buf(pBuf,sizeof(rf24g_ins_t));
-            // }
-        }
+        // {
+        //     // rf24g_ins_t *p = (rf24g_ins_t *) adv_data_pt;
+        //     // if(p->header1 == HEADER1 && p->header2 == HEADER2)
+        //     // {
+        //     //     printf_buf(pBuf,sizeof(rf24g_ins_t));
+        //     // }
+        // }
         
         #endif 
         switch (ad_type) {

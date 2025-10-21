@@ -28,6 +28,8 @@
 #define LOG_CLI_ENABLE
 #include "debug.h"
 
+#include "../../../apps/user_app/rf24g_key/rf24g_key.h"
+
 OS_SEM LED_TASK_SEM;
 
 /*任务列表   */
@@ -362,7 +364,10 @@ void main_while(void)
         stepmotor();         // 无霍尔时，电机停止指令计时
         power_motor_Init();  // 电机
         meteor_period_sub(); // 流星周期控制
-        sound_handle();
+       
+
+        rf24_key_handle();
+        // printf("main circle\n");// 主循环约10ms
 
         os_time_dly(1);
     }
@@ -370,17 +375,18 @@ void main_while(void)
 
 void WS2812_circle_task(void)
 {
+    sound_handle();
     run_tick_per_10ms();
     WS2812FX_service();
 }
 
 void my_main(void)
 {
-    led_gpio_init();
-    led_pwm_init();
-    mic_gpio_init();
-    fan_gpio_init();
-    led_state_init();
+    led_gpio_init(); // 七彩灯输出口
+    led_pwm_init();  // 七彩灯输出口对应的pwm
+    mic_gpio_init(); // mic 
+    // fan_gpio_init(); 
+    led_state_init(); // 流星灯
     mcu_com_init(); // 电机一线通信
 
     read_flash_device_status_init();

@@ -28,6 +28,10 @@
 // #define LOG_CLI_ENABLE
 #include "debug.h"
 
+#if TCFG_RF24GKEY_ENABLE
+#include "../../../../apps/user_app/rf24g_key/rf24g_key.h"
+#endif
+
 #define KEY_EVENT_CLICK_ONLY_SUPPORT 0 // 是否支持某些按键只响应单击事件
 
 #if TCFG_SPI_LCD_ENABLE
@@ -147,6 +151,7 @@ static void key_driver_scan(void *_scan_para)
     /* } */
 
     cur_key_value = scan_para->get_value();
+ 
 
     /* if (cur_key_value != NO_KEY) { */
     /*     printf(">>>cur_key_value: %d\n", cur_key_value); */
@@ -214,34 +219,39 @@ static void key_driver_scan(void *_scan_para)
     {
         is_key_active--;
     }
+
     //===== 按键消抖处理
     if (cur_key_value != scan_para->filter_value && scan_para->filter_time)
     {                                            // 当前按键值与上一次按键值如果不相等, 重新消抖处理, 注意filter_time != 0;
         scan_para->filter_cnt = 0;               // 消抖次数清0, 重新开始消抖
         scan_para->filter_value = cur_key_value; // 记录上一次的按键值
         return;                                  // 第一次检测, 返回不做处理
-    } // 当前按键值与上一次按键值相等, filter_cnt开始累加;
+    }
+
+    // 当前按键值与上一次按键值相等, filter_cnt开始累加;
     if (scan_para->filter_cnt < scan_para->filter_time)
     {
         scan_para->filter_cnt++;
         return;
     }
+
     // 为了滤掉adkey与mic连在一起时电容充放电导致的按键误判,一般用于type-c耳机
     /* if ((cur_key_value != scan_para->last_key) && (scan_para->last_key != NO_KEY) && (cur_key_value != NO_KEY)) { */
     /*     return; */
     /* } */
+
     //===== 按键消抖结束, 开始判断按键类型(单击, 双击, 长按, 多击, HOLD, (长按/HOLD)抬起)
     if (cur_key_value != scan_para->last_key)
     {
         if (cur_key_value == NO_KEY)
-        { // cur_key = NO_KEY; last_key = valid_key -> 按键被抬起
-
+        {
+            // cur_key = NO_KEY; last_key = valid_key -> 按键被抬起
 #if MOUSE_KEY_SCAN_MODE
             /* if (scan_para->press_cnt >= scan_para->long_time) {  //长按/HOLD状态之后被按键抬起; */
             key_event = KEY_EVENT_UP;
             key_value = scan_para->last_key;
             goto _notify; // 发送抬起消息
-            /* } */
+                          /* } */
 #else
 #if TCFG_SOFTOFF_WAKEUP_KEY_DRIVER_ENABLE
             if (scan_para->press_cnt >= (scan_para->long_time - TCFG_LONGKEY_SUPPLEMENT_TIME)) // 长按/HOLD状态之后被按键抬起, 补充长按时间;
@@ -258,7 +268,8 @@ static void key_driver_scan(void *_scan_para)
             scan_para->click_delay_cnt = 1; // 按键等待下次连击延时开始
         }
         else
-        {                             // cur_key = valid_key, last_key = NO_KEY -> 按键被按下
+        {
+            // cur_key = valid_key, last_key = NO_KEY -> 按键被按下
             scan_para->press_cnt = 1; // 用于判断long和hold事件的计数器重新开始计时;
             if (cur_key_value != scan_para->notify_value)
             { // 第一次单击/连击时按下的是不同按键, 单击次数重新开始计数
@@ -376,6 +387,23 @@ _notify:
         return;
     }
 #endif
+
+#if TCFG_RF24GKEY_ENABLE
+    if (KEY_DRIVER_TYPE_RF24GKEY == scan_para->key_type)
+    {
+        // 如果是2.4G遥控器按键
+        extern volatile u8 rf24g_key_driver_value;
+        extern volatile u8 rf24g_key_driver_event;
+        rf24g_key_driver_value = key_value;
+        rf24g_key_driver_event = key_event;
+
+        scan_para->click_cnt = 0; // 单击次数清0
+        scan_para->notify_value = NO_KEY;
+
+        goto _scan_end; // 提前退出
+    }
+#endif // #if TCFG_RF24GKEY_ENABLE
+
     // key_value &= ~BIT(7);  //BIT(7) 用作按键特殊处理的标志
     e.type = SYS_KEY_EVENT;
     e.u.key.init = 1;
@@ -444,17 +472,16 @@ int key_driver_init(void)
     int err;
 
 #if TCFG_RF24GKEY_ENABLE
-    extern void RF24G_Key_Handle(void);
-    extern void RF24G_Key_Long_Scan(void);
-    extern struct key_driver_para rf24g_scan_para;
-    extern struct RF24G_PARA is_rf24g_;
-    // sys_s_hi_timer_add((void *)&rf24g_scan_para, key_driver_scan, rf24g_scan_para.scan_time); //注册按键扫描定时器
-    // sys_s_hi_timer_add(NULL, RF24G_Key_Handle, is_rf24g_._sacn_t); //注册按键扫描定时器
-    // sys_s_hi_timer_add(NULL, RF24G_Key_Long_Scan, is_rf24g_._sacn_t); //注册按键扫描定时器
-    sys_hi_timer_add((void *)&rf24g_scan_para, key_driver_scan, rf24g_scan_para.scan_time); // 注册按键扫描定时器（这里只获取键值，不获取按键事件）
-    sys_hi_timer_add(NULL, RF24G_Key_Handle, is_rf24g_._sacn_t);                            // 注册按键扫描定时器 
-    sys_hi_timer_add(NULL, RF24G_Key_Long_Scan, is_rf24g_._sacn_t);                         // 注册按键扫描定时器 
+    // extern void RF24G_Key_Handle(void);
+    // extern void RF24G_Key_Long_Scan(void);
+    // extern struct key_driver_para rf24g_scan_para;
+    // extern struct RF24G_PARA is_rf24g_;
+    // sys_hi_timer_add((void *)&rf24g_scan_para, key_driver_scan, rf24g_scan_para.scan_time); // 注册按键扫描定时器（这里只获取键值，不获取按键事件）
+    // sys_hi_timer_add(NULL, RF24G_Key_Handle, is_rf24g_._sacn_t);                            // 注册按键扫描定时器
+    // sys_hi_timer_add(NULL, RF24G_Key_Long_Scan, is_rf24g_._sacn_t);                         // 注册按键扫描定时器
 
+    sys_s_hi_timer_add((void *)&rf24g_scan_para, key_driver_scan, rf24g_scan_para.scan_time); // 注册按键扫描定时器
+    // sys_s_hi_timer_add(NULL, rf24_key_handle, 1);
 #endif
 
 #if TCFG_IOKEY_ENABLE
