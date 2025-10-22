@@ -11,6 +11,9 @@
 #include "btstack/le/ble_api.h"
 #include "led_strip_drive.h"
 #include "one_wire.h"
+
+#include "../../../apps/user_app/led_strip/led_strand_effect.h"
+
 dp_data_header_t  dp_data_header;  //涂鸦DP数据头
 dp_switch_led_t   dp_switch_led;   //DPID_SWITCH_LED开关
 dp_work_mode_t    dp_work_mode;    //DPID_WORK_MODE工作模式

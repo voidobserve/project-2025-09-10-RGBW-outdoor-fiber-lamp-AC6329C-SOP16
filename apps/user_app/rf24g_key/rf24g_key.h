@@ -113,6 +113,7 @@ enum
 #define RF34G_KEY_EVENT_MAX (3) // 按键事件种类个数， 短按、持续hold、松开
 
 #define RF24G_KEY_SCAN_TIME_MS (10) // 2.4G遥控器按键扫描频率，单位：ms
+// #define RF24G_KEY_SCAN_TIME_MS (1) // 2.4G遥控器按键扫描频率，单位：ms
 #define RF24G_KEY_LONG_TIME_MS (1500) // 长按事件触发时间，要长一些，防止频繁短按而进入了长按判断中
 #define RF24G_KEY_HOLD_TIME_MS (500)
 #define RF24G_KEY_SCAN_CLICK_DELAY_TIME_MS (0) // 2.4G遥控器按键被抬起后等待连击延时数量

@@ -362,7 +362,7 @@ void main_while(void)
     {
         effect_stepmotor();  // 声控，电机的音乐效果
         stepmotor();         // 无霍尔时，电机停止指令计时
-        power_motor_Init();  // 电机
+        // power_motor_Init();  // 电机
         meteor_period_sub(); // 流星周期控制
        
 
@@ -392,7 +392,7 @@ void my_main(void)
 
     read_flash_device_status_init();
     full_color_init();
-    os_sem_create(&LED_TASK_SEM, 0);
+    // os_sem_create(&LED_TASK_SEM, 0);
     task_create(main_while, NULL, "led_task");
 
     sys_s_hi_timer_add(NULL, WS2812_circle_task, 10); // 10ms

@@ -191,6 +191,12 @@ void WS2812FX_start() {
   _running = true;
 }
 
+// 给内部的 _running 设置为 true
+void WS2812FX_set_running(void)
+{
+    _running = true;
+}
+
 void WS2812FX_stop() {
   _running = false;
   // WS2812FX_strip_off();

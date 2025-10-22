@@ -116,4 +116,18 @@ typedef enum
     IR_TIMER_120MIN = 120*60*1000,
 }AUTO_TIME_T;
 
+void set_static_mode(u8 r, u8 g, u8 b);
+
+void ls_add_speed(void); // 遥控器控制 -- 添加速度
+void ls_sub_speed(void); // 遥控器控制 -- 减去速度
+
+void ls_add_mode_InAPP(void); // 遥控器控制 -- 模式切换 顺序
+void ls_sub_mode_InAPP(void); // 遥控器控制 -- 模式切换 逆序
+
+void ls_add_motor_speed(void); // 遥控器控制 -- 电机速度 变快
+void ls_sub_motor_speed(void); // 遥控器控制 -- 电机速度 变慢
+
+void ls_add_star_speed(void); // 遥控器控制 -- 流星灯速度 变快
+void ls_sub_star_speed(void); // 遥控器控制 -- 流星灯速度 变慢
+
 #endif

@@ -90,7 +90,7 @@ u8 calculate_ms = 0;
 void set_zd_countdown_state(u8 s,u8 index)
 {
 
-    zd_countdown[index].set_on_off = s;   //计时开关或者闹钟开关
+    // zd_countdown[index].set_on_off = s;   //计时开关或者闹钟开关
 
 }
 
@@ -141,7 +141,7 @@ void close_alarm(int index)
 {
     uint8_t Send_buffer[6];        //发送缓存
 
-    zd_countdown[index].set_on_off = 0;
+    // zd_countdown[index].set_on_off = 0;
     alarm_clock[index].on_off = 0;
     Send_buffer[0] = 0x05;
     Send_buffer[1] = index;
@@ -164,6 +164,7 @@ void close_alarm(int index)
 
 void countdown_handler(int index)
 {
+#if 0
     if( zd_countdown[index].set_on_off)  //闹钟开启
     {
 
@@ -222,6 +223,7 @@ void countdown_handler(int index)
         }
 
     }
+#endif
 }
 
 

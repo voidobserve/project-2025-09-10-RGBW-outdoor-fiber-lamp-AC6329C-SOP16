@@ -4,6 +4,8 @@
 #include "Adafruit_NeoPixel.H"
 #include "led_strand_effect.h"
 
+#include "../../../apps/user_app/protocol/dp_data_tran.h"
+
 #define MAX_BRIGHT_RANK 10
 #define MAX_SPEED_RANK 10
 #define MIN_BRIGHT_VALUE 10
@@ -22,13 +24,14 @@ void fc_data_init(void)
 
     // 灯具
     fc_effect.on_off_flag = DEVICE_ON; // 灯为开启状态
-    fc_effect.led_num = 13;            // 灯带的总灯珠数量
+    fc_effect.led_num = 12 + 1;            // 灯带的总灯珠数量
     fc_effect.Now_state = IS_STATIC;   // 当前运行状态 静态
-    fc_effect.rgb.r = 0;
+    fc_effect.rgb.r = 255;
     fc_effect.rgb.g = 0;
     fc_effect.rgb.b = 0;
 #ifdef LED_STRIP_RGBW
-    fc_effect.rgb.w = 255;
+    // fc_effect.rgb.w = 255;
+    fc_effect.rgb.w = 0;
 #endif
     fc_effect.dream_scene.c_n = 1; // 颜色数量为1
     fc_effect.b = 255;
@@ -45,9 +48,9 @@ void fc_data_init(void)
 
     fc_effect.app_rgb_mode = 0;
     // 闹钟
-    zd_countdown[0].set_on_off = DEVICE_OFF;
-    zd_countdown[1].set_on_off = DEVICE_OFF;
-    zd_countdown[2].set_on_off = DEVICE_OFF;
+    // zd_countdown[0].set_on_off = DEVICE_OFF;
+    // zd_countdown[1].set_on_off = DEVICE_OFF;
+    // zd_countdown[2].set_on_off = DEVICE_OFF;
 
     // 流星
     fc_effect.star_on_off = DEVICE_ON;
@@ -76,45 +79,41 @@ static u8 tk = 0;
  *********************************************************/
 void soft_turn_on_the_light(void) // 软开灯处理
 {
-
-    fc_effect.on_off_flag = DEVICE_ON;
-
-    // if (tk)
+    // if (DEVICE_OFF == fc_effect.on_off_flag)
     {
+        fc_effect.on_off_flag = DEVICE_ON;
 
-        OpenMortor();
+        OpenMortor(); // 给对应标志位置位，表示电机打开
+
+        motor_Init();     // 初始化电机相关的变量
+        WS2812FX_start(); // 清空动画使用到的缓存，给运行标志位置位
+        // open_fan();
+        set_fc_effect();         // 七彩灯动画效果设置
+        ls_meteor_stat_effect(); // 流星灯动画效果设置 这个函数里面会写入一次flash
+        fb_led_on_off_state();   // 与app同步开关状态
+        save_user_data_area3();  // 保存参数配置到flash
+
+        printf("soft_turn_on_the_light\n");
     }
-    // else
-    // {
-    //     tk = 1;
-    // }
-
-    // motor_Init();
-    // WS2812FX_start();
-    // open_fan();
-    set_fc_effect();
-    // ls_meteor_stat_effect();
-    // fb_led_on_off_state();  // 与app同步开关状态
-    // save_user_data_area3(); // 保存参数配置到flash
-
-    printf("soft_turn_on_the_light\n");
 }
 
 void CloseMotor(void);
 void soft_turn_off_lights(void) // 软关灯处理
 {
-    fc_effect.on_off_flag = DEVICE_OFF;
-    // tk = 1; //
+    if (fc_effect.on_off_flag == DEVICE_ON)
+    {
+        fc_effect.on_off_flag = DEVICE_OFF;
 
-    CloseMotor();
-    
-    WS2812FX_stop();
-    WS2812FX_strip_off(); // 清空缓存
-    // close_fan();  
-    fb_led_on_off_state();  // 与app同步设备的开关状态
-    save_user_data_area3(); // 保存参数配置到flash
+        CloseMotor();
 
-    // printf("soft_turn_off_lights\n");
+        WS2812FX_stop();
+        WS2812FX_strip_off(); // 清空缓存
+        // close_fan();
+        fb_led_on_off_state();  // 与app同步设备的开关状态
+        save_user_data_area3(); // 保存参数配置到flash
+
+        printf("soft_turn_off_lights\n");
+    }
 }
 
 /*********************************************************
@@ -199,7 +198,7 @@ void ls_add_bright(void)
         WS2812FX_setBrightness(fc_effect.b);
     }
 
-    printf(" fc_effect.b = %d", fc_effect.b);
+    // printf(" fc_effect.b = %d", fc_effect.b);
 }
 
 /**
@@ -220,7 +219,7 @@ void ls_sub_bright(void)
         WS2812FX_setBrightness(fc_effect.b);
     }
 
-    printf(" fc_effect.b = %d", fc_effect.b);
+    // printf(" fc_effect.b = %d", fc_effect.b);
 }
 
 /**
@@ -231,7 +230,7 @@ void ls_add_speed(void)
 {
     if (fc_effect.Now_state == IS_light_scene)
     {
-
+        // 数值越小，速度越快：
         if (fc_effect.ls_speed > 0)
             fc_effect.ls_speed--;
         fc_effect.app_speed = 100 - (fc_effect.ls_speed) * 10;
@@ -240,7 +239,7 @@ void ls_add_speed(void)
         set_fc_effect();
     }
 
-    printf("  fc_effect.dream_scene.speed = %d", fc_effect.dream_scene.speed);
+    // printf("  fc_effect.dream_scene.speed = %d", fc_effect.dream_scene.speed);
 }
 
 /**
@@ -252,7 +251,7 @@ void ls_sub_speed(void)
 
     if (fc_effect.Now_state == IS_light_scene)
     {
-
+        // 数值越大，速度越慢：
         if (fc_effect.ls_speed < (MAX_SPEED_RANK - 1))
             fc_effect.ls_speed++;
         fc_effect.app_speed = 100 - (fc_effect.ls_speed) * 10;
@@ -260,7 +259,8 @@ void ls_sub_speed(void)
         fb_speed();
         set_fc_effect();
     }
-    printf("  fc_effect.dream_scene.speed = %d", fc_effect.dream_scene.speed);
+
+    // printf("  fc_effect.dream_scene.speed = %d", fc_effect.dream_scene.speed);
 }
 
 /**
@@ -639,7 +639,6 @@ void ls_set_star_speed(void)
 
 void ls_add_star_speed(void)
 {
-
     if (fc_effect.star_on_off != DEVICE_ON)
         return;
 
@@ -760,19 +759,7 @@ void ls_set_motor_speed(void)
 
 void ls_add_motor_speed(void)
 {
-
-    if (fc_effect.star_speed_index < 5)
-    {
-        fc_effect.star_speed_index++;
-        one_wire_set_period(motor_period[fc_effect.star_speed_index]);
-        enable_one_wire();
-        printf("fc_effect.star_speed_index = %d", fc_effect.star_speed_index);
-    }
-}
-
-void ls_sub_motor_speed(void)
-{
-
+    // 目前是索引值越小，电机转速越快
     if (fc_effect.star_speed_index > 0)
     {
         fc_effect.star_speed_index--;
@@ -782,43 +769,53 @@ void ls_sub_motor_speed(void)
     }
 }
 
+void ls_sub_motor_speed(void)
+{
+    // 目前是索引值越小，电机转速越快
+    if (fc_effect.star_speed_index < 5)
+    {
+        fc_effect.star_speed_index++;
+        one_wire_set_period(motor_period[fc_effect.star_speed_index]);
+        enable_one_wire();
+        printf("fc_effect.star_speed_index = %d", fc_effect.star_speed_index);
+    }
+}
+
 void CloseMotor(void)
 {
-
     fc_effect.motor_on_off = DEVICE_OFF;
     one_wire_set_period(motor_period[fc_effect.star_speed_index]);
     one_wire_set_mode(0x06); // 关闭电机
-    enable_one_wire();    // 启动发送电机数据
+    enable_one_wire();       // 启动发送电机数据
 }
 
-u8 mo_cnt = 3;
+// u8 mo_cnt = 3;
 void OpenMortor(void)
 {
-
     fc_effect.motor_on_off = DEVICE_ON;
-    mo_cnt = 3;
+    // mo_cnt = 3;
 }
 
-void power_motor_Init(void)
-{
+// void power_motor_Init(void)
+// {
 
-    if (mo_cnt > 1)
-    {
-        mo_cnt--;
+//     if (mo_cnt > 1)
+//     {
+//         mo_cnt--;
 
-        if (fc_effect.motor_on_off == DEVICE_ON)
-        {
-            one_wire_set_mode(4);
-            enable_one_wire();
-        }
-        else
-        {
+//         if (fc_effect.motor_on_off == DEVICE_ON)
+//         {
+//             one_wire_set_mode(4);
+//             enable_one_wire();
+//         }
+//         else
+//         {
 
-            one_wire_set_mode(6); // 停止电机
-            enable_one_wire();
-        }
-    }
-}
+//             one_wire_set_mode(6); // 停止电机
+//             enable_one_wire();
+//         }
+//     }
+// }
 
 /*********************************************************
  *
@@ -899,9 +896,9 @@ void app_set_cw(void)
 
 void ls_add_mode_InAPP(void)
 {
-
     u8 user_buff[3] = {0};
-    if (fc_effect.app_rgb_mode < 0x1e)
+#if 0
+    if (fc_effect.app_rgb_mode < 0x1e) // 七彩灯模式
     {
         fc_effect.app_rgb_mode++;
 
@@ -909,13 +906,34 @@ void ls_add_mode_InAPP(void)
         user_buff[1] = 0x02;
         user_buff[2] = fc_effect.app_rgb_mode;
         parse_zd_data(user_buff);
-        printf("fc_effect.app_rgb_mode = %d", fc_effect.app_rgb_mode);
+        // printf("fc_effect.app_rgb_mode = %d", fc_effect.app_rgb_mode);
     }
+#endif
+
+    if (fc_effect.app_rgb_mode < 0x1e) // 七彩灯模式
+    {
+        fc_effect.app_rgb_mode++;
+
+        user_buff[0] = 0x04;
+        user_buff[1] = 0x02;
+        user_buff[2] = fc_effect.app_rgb_mode;
+        parse_zd_data(user_buff);
+        // printf("fc_effect.app_rgb_mode = %d", fc_effect.app_rgb_mode);
+    }
+    else if (fc_effect.app_rgb_mode < 0x1E + 22) // 流星灯模式
+    {
+        fc_effect.app_rgb_mode++;
+        fc_effect.star_index = fc_effect.app_rgb_mode - 0x1E;
+        app_set_mereor_mode(fc_effect.star_index);
+    }
+
+    printf("fc_effect.app_rgb_mode = %d", fc_effect.app_rgb_mode);
 }
 
 void ls_sub_mode_InAPP(void)
 {
     u8 user_buff[3] = {0};
+#if 0
     if (fc_effect.app_rgb_mode > 0)
     {
         fc_effect.app_rgb_mode--;
@@ -924,8 +942,27 @@ void ls_sub_mode_InAPP(void)
         user_buff[1] = 0x02;
         user_buff[2] = fc_effect.app_rgb_mode;
         parse_zd_data(user_buff);
-        printf("fc_effect.app_rgb_mode = %d", fc_effect.app_rgb_mode);
+        // printf("fc_effect.app_rgb_mode = %d", fc_effect.app_rgb_mode);
     }
+#endif
+
+    if (fc_effect.app_rgb_mode > 0x1E + 1) // 流星灯模式 (流星灯的索引值不能为0，这里要加一)
+    {
+        fc_effect.app_rgb_mode--;
+        fc_effect.star_index = fc_effect.app_rgb_mode - 0x1E;
+        app_set_mereor_mode(fc_effect.star_index);
+    }
+    else if (fc_effect.app_rgb_mode > 0)
+    {
+        fc_effect.app_rgb_mode--;
+
+        user_buff[0] = 0x04;
+        user_buff[1] = 0x02;
+        user_buff[2] = fc_effect.app_rgb_mode;
+        parse_zd_data(user_buff);
+    }
+
+    printf("fc_effect.app_rgb_mode = %d", fc_effect.app_rgb_mode);
 }
 
 /**
@@ -1130,15 +1167,15 @@ void ir_timer_handler(void)
 
 // 全彩效果初始化
 void full_color_init(void)
-{ 
+{
     WS2812FX_init(fc_effect.led_num, fc_effect.sequence); // 初始化ws2811
     WS2812FX_setBrightness(fc_effect.b);
     set_on_off_led(fc_effect.on_off_flag);
 
     extern void count_down_run(void);
     extern void time_clock_handler(void);
-    sys_s_hi_timer_add(NULL, count_down_run, 10);     // 注册按键扫描定时器
+    // sys_s_hi_timer_add(NULL, count_down_run, 10); // 注册按键扫描定时器
     // sys_s_hi_timer_add(NULL, ir_timer_handler, 10);   // 注册按键扫描定时器
     // sys_s_hi_timer_add(NULL, time_clock_handler, 10); // 注册按键扫描定时器
-    sys_s_hi_timer_add(NULL, meteor_period_sub, 10);  // 注册按键扫描定时器
+    sys_s_hi_timer_add(NULL, meteor_period_sub, 10); // 注册按键扫描定时器
 }

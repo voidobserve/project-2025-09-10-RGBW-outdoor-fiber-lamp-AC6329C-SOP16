@@ -58,6 +58,7 @@ void save_user_data_area3(void)
     memcpy((u8*)(&save_data.fc_save) , (u8*)(&fc_effect), sizeof(fc_effect_t));
     syscfg_write(CFG_USER_LED_LEDGTH_DATA, (u8 *)(&save_data), sizeof(save_flash_t));
 
+    // printf("__FUNC__ %s __LINE__ %u\n", __func__, __LINE__);
 }
 
 

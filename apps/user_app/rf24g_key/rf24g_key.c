@@ -1,5 +1,6 @@
 #include "rf24g_key.h"
 #include "../../../apps/user_app/led_strip/led_strand_effect.h"
+#include "../../../apps/user_app/save_flash/save_flash.h" // 包含读写flash的接口
 
 #if 1
 
@@ -60,9 +61,10 @@ volatile struct key_driver_para rf24g_scan_para = {
 void rf24g_scan(u8 *recv_buff)
 {
     rf24g_recv_info_t *p = (rf24g_recv_info_t *)recv_buff;
-    if (p->header1 == RF24G_HEADER_1 && p->header2 == RF24G_HEADER_2)
+    // if (p->header1 == RF24G_HEADER_1 && p->header2 == RF24G_HEADER_2)
+    if (p->header1 == 0xDC && p->header2 == 0xDC || (p->header1 == RF24G_HEADER_1 && p->header2 == RF24G_HEADER_2)) // 测试时使用
     {
-        // printf_buf(recv_buff, sizeof(rf24g_recv_info_t)); // 打印接收到的数据包
+        printf_buf(recv_buff, sizeof(rf24g_recv_info_t)); // 打印接收到的数据包
 
         // rf24g_recv_info = *p; // 结构体变量赋值
 
@@ -83,7 +85,7 @@ void rf24g_scan(u8 *recv_buff)
 static u8 rf24g_get_key_value(void)
 {
     u8 key_value = 0;
-    static u8 time_out_cnt = 0; // 加入超时，防止丢包（超时时间与按键扫描时间有关）
+    static u16 time_out_cnt = 0; // 加入超时，防止丢包（超时时间与按键扫描时间有关）
     static u8 last_key_value = 0;
 
     if (rf24g_rx_flag == 1) // 收到2.4G广播
@@ -106,7 +108,14 @@ static u8 rf24g_get_key_value(void)
             // }
             key_value = rf24g_key_val;
 
-            time_out_cnt = 30; // 2.4G接收可能会丢失100~200ms的数据包（响应会慢一些）
+            // printf("__LINE__ %u", __LINE__);
+
+            if (RF24G_KEY_CHROMATIC_CIRCLE != key_value) // 收到一次色环的键值就处理一次，不用等超时
+            {
+                // time_out_cnt = 30; // 2.4G接收可能会丢失100~200ms的数据包（响应会慢一些）
+                time_out_cnt = 20; // 2.4G接收可能会丢失100~200ms的数据包（响应会慢一些）
+            }
+
             last_key_value = key_value;
 
             // rf24g_recv_info.key_v = NO_KEY;
@@ -166,6 +175,12 @@ u8 rf24g_convert_key_event(u8 key_value, u8 key_driver_event)
 volatile u8 color_index_cur;
 volatile u8 color_index_dest;
 
+#define ADJUST_WHITE_BRIGHTNESS_STEP 10 // 冷白亮度、暖白亮度的调节步长
+// static u8 cold_white_brightness = 128;  // 冷白亮度，初始值50%
+// static u8 warm_white_brightness = 128;  // 暖白亮度，初始值50%
+static u8 cold_white_brightness = 0;   // 冷白亮度，初始值
+static u8 warm_white_brightness = 255; // 暖白亮度，初始值
+
 void rf24_key_handle(void)
 {
     u8 rf24g_key_event = 0;
@@ -183,14 +198,13 @@ void rf24_key_handle(void)
     case RF24G_KEY_EVENT_ON_OFF_CLICK: // 短按 -- 开机
     {
         printf("key event on/off click\n");
-
+        // read_flash_device_status_init(); // 读取设备状态（目前应该不用加这一句）
         soft_turn_on_the_light();
     }
     break;
     case RF24G_KEY_EVENT_ON_OFF_HOLD: // 长按 -- 关机
     {
         printf("key event on/off hold\n");
-
         soft_turn_off_lights();
     }
     break;
@@ -198,6 +212,7 @@ void rf24_key_handle(void)
     case RF24G_KEY_EVENT_CHROMATIC_CIRCLE_CLICK:
     case RF24G_KEY_EVENT_CHROMATIC_CIRCLE_HOLD:
     {
+        // printf("key event chromatic circle\n");
         // printf("key event chromatic circle click\n");
         // printf("key event chromatic circle hold\n");
 
@@ -209,12 +224,17 @@ void rf24_key_handle(void)
         r = chromatic_circle_table[chromatic_circle_val][0];
         g = chromatic_circle_table[chromatic_circle_val][1];
         b = chromatic_circle_table[chromatic_circle_val][2];
-        // fc_effect.rgb.r = r;
-        // fc_effect.rgb.g = g;
-        // fc_effect.rgb.b = b;
+        fc_effect.rgb.r = r;
+        fc_effect.rgb.g = g;
+        fc_effect.rgb.b = b;
+        fc_effect.Now_state = IS_STATIC;
 
-        set_static_mode(r, g, b);
+        // 如果调节了冷白、暖白亮度，不能只通过 set_static_mode 来调节颜色：
+        // set_static_mode(r, g, b);
+        set_fc_effect(); // 效果调度
 
+        // 这里可能要一段时间无操作后再写入flash：（实际测试，频繁调节色环不会造成卡顿）
+        save_user_data_area3();
 #if 0
         fc_effect.Now_state = COLORFUL_LIGHTS_STATIC;
         fc_effect.dream_scene.c_n = 1;
@@ -242,23 +262,205 @@ void rf24_key_handle(void)
     break;
 
     case RF24G_KEY_EVENT_BRIGHTNESS_ADD_CLICK: // 亮度加
+        printf("key event brightness add click\n");
+    case RF24G_KEY_EVENT_BRIGHTNESS_ADD_HOLD:
     {
+
+        // 目前只有静态模式才能调亮度
         ls_add_bright();
+        save_user_data_area3();
     }
     break;
 
     case RF24G_KEY_EVENT_BRIGHTNESS_SUB_CLICK: // 亮度减
+    case RF24G_KEY_EVENT_BRIGHTNESS_SUB_HOLD:
     {
+        // 目前只有静态模式才能调亮度
         ls_sub_bright();
+        save_user_data_area3();
     }
     break;
-        // case RF24G_KEY_EVENT_ON_OFF_LOOSE:
-        // {
-        //     printf("key event on/off loose\n");
-        // }
-        // break;
 
-        // case RF
+    case RF24G_KEY_EVENT_DYNAMIC_SPEED_ADD_CLICK: // 动态速度加
+        // case RF24G_KEY_EVENT_DYNAMIC_SPEED_ADD_HOLD:
+        {
+            // 目前只有在动态模式下，才加快速度
+            ls_add_speed();
+            save_user_data_area3();
+        }
+        break;
+
+    case RF24G_KEY_EVENT_DYNAMIC_SPEED_SUB_CLICK: // 动态速度减
+        // case RF24G_KEY_EVENT_DYNAMIC_SPEED_SUB_HOLD:
+        {
+            // 目前只有在动态模式下，才减慢速度
+            ls_sub_speed();
+            save_user_data_area3();
+        }
+        break;
+
+    case RF24G_KEY_EVENT_MODE_ADD_CLICK: // 模式加
+    {
+        // USER_TO_DO 需要加上流星灯模式的切换
+        ls_add_mode_InAPP();
+        save_user_data_area3();
+    }
+    break;
+
+    case RF24G_KEY_EVENT_MODE_SUB_CLICK: // 模式减
+    {
+        // USER_TO_DO 需要加上流星灯模式的切换
+        ls_sub_mode_InAPP();
+        save_user_data_area3();
+    }
+    break;
+
+    case RF24G_KEY_EVENT_COLD_WHITE_BRIGHTNESS_ADD_CLICK: // 冷白亮度加 同时暖白亮度减
+    case RF24G_KEY_EVENT_COLD_WHITE_BRIGHTNESS_ADD_HOLD:
+    {
+        // 在静态模式下调节冷白和暖白亮度
+        if (fc_effect.Now_state == IS_STATIC)
+        {
+            // 增加冷白亮度
+            // if (cold_white_brightness < 255)
+            // {
+            //     cold_white_brightness++;
+            // }
+
+            // // 减少暖白亮度
+            // if (warm_white_brightness > 0)
+            // {
+            //     warm_white_brightness--;
+            // }
+
+            if (cold_white_brightness < 255 - ADJUST_WHITE_BRIGHTNESS_STEP)
+            {
+                cold_white_brightness += ADJUST_WHITE_BRIGHTNESS_STEP;
+            }
+            else
+            {
+                cold_white_brightness = 255;
+            }
+
+            // 减少暖白亮度
+            if (warm_white_brightness > 0 + ADJUST_WHITE_BRIGHTNESS_STEP)
+            {
+                warm_white_brightness -= ADJUST_WHITE_BRIGHTNESS_STEP;
+            }
+            else
+            {
+                warm_white_brightness = 0;
+            }
+
+            // 根据冷白和暖白的组合值设置最终的白光输出
+            // 这里简化处理，实际可以根据色温需求调整算法
+            // u8 final_white = (cold_white_brightness + (255 - warm_white_brightness)) / 2;
+            fc_effect.rgb.w = (cold_white_brightness + (255 - warm_white_brightness)) / 2;
+
+            // printf("cold_white_brightness: %u\n", (u16)cold_white_brightness);
+            // printf("warm_white_brightness: %u\n", (u16)warm_white_brightness);
+            // printf("fc_effect.rgb.w: %u\n", (u16)fc_effect.rgb.w);
+
+            // 更新显示
+            // set_static_mode(fc_effect.rgb.r, fc_effect.rgb.g, fc_effect.rgb.b, fc_effect.rgb.w);
+            set_fc_effect(); // 效果调度
+            fb_bright();     // 反馈亮度变化给APP
+            save_user_data_area3();
+        }
+    }
+    break;
+
+    case RF24G_KEY_EVENT_COLD_WHITE_BRIGHTNESS_SUB_CLICK: // 冷白亮度减 同时暖白亮度加
+    case RF24G_KEY_EVENT_COLD_WHITE_BRIGHTNESS_SUB_HOLD:
+    {
+        // 在静态模式下调节冷白和暖白亮度
+        if (fc_effect.Now_state == IS_STATIC)
+        {
+            // // 减少冷白亮度
+            // if (cold_white_brightness > 0)
+            // {
+            //     cold_white_brightness--;
+            // }
+
+            // // 增加暖白亮度
+            // if (warm_white_brightness < 255)
+            // {
+            //     warm_white_brightness++;
+            // }
+
+            // 减少冷白亮度
+            if (cold_white_brightness > 0 + ADJUST_WHITE_BRIGHTNESS_STEP)
+            {
+                cold_white_brightness -= ADJUST_WHITE_BRIGHTNESS_STEP;
+            }
+            else
+            {
+                cold_white_brightness = 0;
+            }
+
+            // 增加暖白亮度
+            if (warm_white_brightness < 255 - ADJUST_WHITE_BRIGHTNESS_STEP)
+            {
+                warm_white_brightness += ADJUST_WHITE_BRIGHTNESS_STEP;
+            }
+            else
+            {
+                warm_white_brightness = 255;
+            }
+
+            // 根据冷白和暖白的组合值设置最终的白光输出
+            // 这里简化处理，实际可以根据色温需求调整算法
+            // u8 final_white = (cold_white_brightness + (255 - warm_white_brightness)) / 2;
+            fc_effect.rgb.w = (cold_white_brightness + (255 - warm_white_brightness)) / 2;
+
+            // printf("cold_white_brightness: %u\n", (u16)cold_white_brightness);
+            // printf("warm_white_brightness: %u\n", (u16)warm_white_brightness);
+            // printf("fc_effect.rgb.w: %u\n", (u16)fc_effect.rgb.w);
+
+            // 更新显示
+            // set_static_mode(fc_effect.rgb.r, fc_effect.rgb.g, fc_effect.rgb.b, fc_effect.rgb.w);
+            set_fc_effect(); // 效果调度
+            fb_bright();     // 反馈亮度变化给APP
+            save_user_data_area3();
+        }
+    }
+    break;
+
+    case RF24G_KEY_EVENT_MOTOR_SPEED_ADD_CLICK: // 电机速度加
+    {
+        ls_add_motor_speed();
+        save_user_data_area3();
+    }
+    break;
+
+    case RF24G_KEY_EVENT_MOTOR_SPEED_SUB_CLICK: // 电机速度减
+    {
+        ls_sub_motor_speed();
+        save_user_data_area3();
+    }
+    break;
+
+    case RF24G_KEY_EVENT_METEOR_SPEED_ADD_CLICK: // 流星灯速度加
+    {
+        // 流星灯开启时，才调节速度：
+        ls_add_star_speed();
+        if (DEVICE_ON == fc_effect.star_on_off)
+        {
+            save_user_data_area3();
+        }
+    }
+    break;
+
+    case RF24G_KEY_EVENT_METEOR_SPEED_SUB_CLICK: // 流星灯速度减
+    {
+        // 流星灯开启时，才调节速度：
+        ls_sub_star_speed();
+        if (DEVICE_ON == fc_effect.star_on_off)
+        {
+            save_user_data_area3();
+        }
+    }
+    break;
 
     } // switch (rf24g_key_event)
 }

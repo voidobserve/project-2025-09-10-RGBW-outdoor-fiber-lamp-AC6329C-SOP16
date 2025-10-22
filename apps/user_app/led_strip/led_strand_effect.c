@@ -94,7 +94,8 @@ static void static_mode(void)
     WS2812FX_set_coloQty(0, fc_effect.dream_scene.c_n); // 设置颜色数量  0：第0段   fc_effect.dream_scene.c_n  颜色数量，一个颜色包含（RGB）
     ls_set_colors(1, &fc_effect.rgb);                   // 1:1个颜色    &fc_effect.rgb 这个颜色是什么色
 
-    WS2812FX_start();
+    WS2812FX_start(); // 不能在这里清空显示的缓存，会导致流星灯也闪烁（流星灯会重新开始跑）
+    // WS2812FX_set_running();
 }
 
 /*----------------------------------彩虹效果----------------------------------*/
@@ -113,6 +114,7 @@ static void strand_rainbow(void)
     ls_set_colors(fc_effect.dream_scene.c_n, &fc_effect.dream_scene.rgb);
 
     WS2812FX_start();
+    // WS2812FX_set_running();
 }
 
 /*----------------------------------跳变效果----------------------------------*/
@@ -131,6 +133,7 @@ void strand_jump_change(void)
     ls_set_colors(fc_effect.dream_scene.c_n, &fc_effect.dream_scene.rgb);
 
     WS2812FX_start();
+    // WS2812FX_set_running();
 }
 /*----------------------------------呼吸系列效果----------------------------------*/
 void strand_breath(void)
@@ -149,6 +152,7 @@ void strand_breath(void)
     ls_set_colors(fc_effect.dream_scene.c_n, &fc_effect.dream_scene.rgb);
 
     WS2812FX_start();
+    // WS2812FX_set_running();
 }
 
 void single_c_breath(void)
@@ -167,6 +171,7 @@ void single_c_breath(void)
     ls_set_colors(fc_effect.dream_scene.c_n, &fc_effect.dream_scene.rgb);
 
     WS2812FX_start();
+    // WS2812FX_set_running();
 }
 
 /*----------------------------------闪烁效果----------------------------------*/
@@ -185,6 +190,7 @@ void strand_twihkle(void)
     ls_set_colors(fc_effect.dream_scene.c_n, &fc_effect.dream_scene.rgb);
 
     WS2812FX_start();
+    // WS2812FX_set_running();
 }
 // 多颜色频闪
 void ls_strobe(void)
@@ -201,6 +207,7 @@ void ls_strobe(void)
     WS2812FX_set_coloQty(0, fc_effect.dream_scene.c_n);
     ls_set_colors(fc_effect.dream_scene.c_n, &fc_effect.dream_scene.rgb);
     WS2812FX_start();
+    // WS2812FX_set_running();
 }
 /*----------------------------------流水效果----------------------------------*/
 void strand_flow_water(void)
@@ -228,6 +235,7 @@ void strand_flow_water(void)
     ls_set_colors(fc_effect.dream_scene.c_n, &fc_effect.dream_scene.rgb);
 
     WS2812FX_start();
+    // WS2812FX_set_running();
 }
 
 /*----------------------------------追光效果----------------------------------*/
@@ -260,6 +268,7 @@ void strand_chas_light(void)
     ls_set_colors(fc_effect.dream_scene.c_n, &fc_effect.dream_scene.rgb);
 
     WS2812FX_start();
+    // WS2812FX_set_running();
 }
 
 /*----------------------------------炫彩效果----------------------------------*/
@@ -278,6 +287,7 @@ void strand_colorful(void)
     ls_set_colors(fc_effect.dream_scene.c_n, &fc_effect.dream_scene.rgb);
 
     WS2812FX_start();
+    // WS2812FX_set_running();
 }
 
 /*----------------------------------渐变系列效果----------------------------------*/
@@ -296,6 +306,7 @@ void strand_grandual(void)
     ls_set_colors(fc_effect.dream_scene.c_n, &fc_effect.dream_scene.rgb);
 
     WS2812FX_start();
+    // WS2812FX_set_running();
 }
 // 整条灯带渐变，支持多种颜色之间切换
 // 颜色池：fc_effect.dream_scene.rgb[]
@@ -314,6 +325,7 @@ void mutil_c_grandual(void)
     WS2812FX_set_coloQty(0, fc_effect.dream_scene.c_n);
     ls_set_colors(fc_effect.dream_scene.c_n, &fc_effect.dream_scene.rgb);
     WS2812FX_start();
+    // WS2812FX_set_running();
 }
 
 // 纯白色渐变
@@ -331,6 +343,7 @@ void w_grandual(void)
         0);                          // 选项，这里像素点大小：3,反向/反向
 
     WS2812FX_start();
+    // WS2812FX_set_running();
 }
 
 /*----------------------------------跳变效果----------------------------------*/
@@ -349,6 +362,7 @@ void standard_jump(void)
     WS2812FX_set_coloQty(0, fc_effect.dream_scene.c_n);
     ls_set_colors(fc_effect.dream_scene.c_n, &fc_effect.dream_scene.rgb);
     WS2812FX_start();
+    // WS2812FX_set_running();
 }
 
 //====================================================================================================
@@ -711,8 +725,7 @@ static void ls_custom_effect(void)
  *
  */
 void ls_meteor_stat_effect(void)
-{
-
+{ 
     fc_effect.period_cnt = 0;
     if (fc_effect.star_on_off == DEVICE_ON)
     {
@@ -953,7 +966,7 @@ void ls_meteor_stat_effect(void)
         }
         else if (fc_effect.star_index == 22)
         {
-            double_meteor();
+            double_meteor(); // 双流星
         }
     }
     save_user_data_area3(); // 保存参数配置到flash

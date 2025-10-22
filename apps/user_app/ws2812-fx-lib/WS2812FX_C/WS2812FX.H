@@ -247,7 +247,7 @@ Segment_runtime* getSegmentRuntime_seg(uint8_t);
 Segment_runtime* getSegmentRuntimes(void);
 
 
-
+void WS2812FX_set_running(void);
 
 
 #endif /* __BSP_WS2812FX_H */

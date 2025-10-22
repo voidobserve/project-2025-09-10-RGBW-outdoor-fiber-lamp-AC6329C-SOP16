@@ -21,7 +21,8 @@ typedef struct
 
 extern u8 period[6];
 
-
+// 设置电机周期（设置电机转速）
+void one_wire_set_period(u8 p);
 
 #endif
 

@@ -104,8 +104,10 @@ bool ble_comm_need_wait_encryption(u8 role);
 //搜索 周期大小
 // #define SET_EXT_SCAN_INTERVAL   64 //(unit:0.625ms)
 #define SET_EXT_SCAN_INTERVAL   16 //(unit:0.625ms)
+// #define SET_EXT_SCAN_INTERVAL   10 //(unit:0.625ms)
 //搜索 窗口大小
 #define SET_EXT_SCAN_WINDOW     16 //(unit:0.625ms)
+// #define SET_EXT_SCAN_WINDOW     10 //(unit:0.625ms)
 
 //连接周期
 #define SET_EXT_CONN_INTERVAL   24 //(unit:1.25ms)
