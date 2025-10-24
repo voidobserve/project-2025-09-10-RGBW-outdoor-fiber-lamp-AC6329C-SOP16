@@ -856,7 +856,8 @@ void parse_zd_data(unsigned char *LedCommand)
     
                 one_wire_set_mode(LedCommand[2]); //配置模式
                 os_time_dly(1);
-                enable_one_wire();  //使用发送数据
+                // enable_one_wire();  //使用发送数据
+                
                 extern u8 counting_flag ;
                 extern u8 set_time;
                 extern u8 stop_cnt;
@@ -869,6 +870,7 @@ void parse_zd_data(unsigned char *LedCommand)
                     fc_effect.motor_on_off = DEVICE_ON;
                 }
 
+                os_taskq_post("msg_task", 1, MSG_SEQUENCER_ONE_WIRE_SEND_INFO);
                 fb_motor_mode();
 
             }
@@ -879,7 +881,9 @@ void parse_zd_data(unsigned char *LedCommand)
                 extern void one_wire_set_period(u8 p);
                 one_wire_set_period(LedCommand[2]);
                 os_time_dly(1);
-                enable_one_wire();
+                // enable_one_wire();
+                
+                os_taskq_post("msg_task", 1, MSG_SEQUENCER_ONE_WIRE_SEND_INFO);
                 fb_motor_speed();
 
             }

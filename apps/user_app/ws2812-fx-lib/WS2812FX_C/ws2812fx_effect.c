@@ -397,7 +397,6 @@ uint16_t WS2812FX_mode_comet_5(void)
  *
  * @return uint16_t
  */
-
 uint16_t fc_double_meteor(void)
 {
 
@@ -408,8 +407,12 @@ uint16_t fc_double_meteor(void)
     u8 offset = _seg_len / 2 + 1;
     WS2812FX_fade_out();
 
+    u16 index = 0;
+
     if (IS_REVERSE) // 反向
     {
+        // printf("reverse\n");
+
         if (_seg_rt->counter_mode_step < _seg_len / 2)
         {
             WS2812FX_setPixelColor(_seg->stop - _seg_rt->counter_mode_step, WHITE); // 第一组 1-5
@@ -421,7 +424,11 @@ uint16_t fc_double_meteor(void)
 
         if (_seg_rt->counter_mode_step > _seg_len / 2 && _seg_rt->counter_mode_step < (_seg_len + 9)) // 第一组第二次
         {
-            WS2812FX_setPixelColor(_seg->stop - _seg_rt->counter_mode_step + (_seg_len / 2 + 1), WHITE);
+            index = _seg->stop - _seg_rt->counter_mode_step + (_seg_len / 2 + 1);
+            if (index >= _seg->start && index <= _seg->stop) // 防止越界
+            {
+                WS2812FX_setPixelColor(_seg->stop - _seg_rt->counter_mode_step + (_seg_len / 2 + 1), WHITE);
+            }
         }
 
         if (_seg_rt->counter_mode_step > 3 && _seg_rt->counter_mode_step < (_seg_len + 4))
@@ -431,9 +438,15 @@ uint16_t fc_double_meteor(void)
     }
     else // 正向
     {
+        // printf("sequence\n");
+
         if (_seg_rt->counter_mode_step < _seg_len)
         {
-            WS2812FX_setPixelColor(_seg->start + _seg_rt->counter_mode_step, WHITE); // 第一段
+            index = _seg->start + _seg_rt->counter_mode_step;
+            if (index >= _seg->start && index <= _seg->stop) // 防止越界
+            {
+                WS2812FX_setPixelColor(_seg->start + _seg_rt->counter_mode_step, WHITE); // 第一段
+            }
         }
         // if(_seg_rt->counter_mode_step >= _seg_len / 2 )
         // {
@@ -444,6 +457,7 @@ uint16_t fc_double_meteor(void)
         {
             WS2812FX_setPixelColor(_seg->start + _seg_rt->counter_mode_step - _seg_len / 2, WHITE); // 第二段
         }
+
         if (_seg_rt->counter_mode_step > 3)
         {
             WS2812FX_setPixelColor(_seg->start + _seg_rt->counter_mode_step - 4, BLACK);

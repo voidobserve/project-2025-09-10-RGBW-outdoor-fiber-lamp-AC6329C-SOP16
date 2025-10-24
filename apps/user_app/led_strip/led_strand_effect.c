@@ -391,7 +391,9 @@ void strand_meteor(u8 index)
         WHITE,                           // 颜色，WS2812FX_setColors设置
         fc_effect.star_speed,            // 速度
         fade_type[index - 19] | option); // 选项，这里像素点大小：3,反向/反向
-    WS2812FX_start();
+    // WS2812FX_start();
+    WS2812FX_resetSegmentRuntime(1); // 重置流星灯所在的段运行时参数
+    WS2812FX_set_running();
 }
 
 void double_meteor(void)
@@ -418,7 +420,9 @@ void double_meteor(void)
         fc_effect.star_speed, // 速度
         option);              // 选项，这里像素点大小：3,反向/反向
 
-    WS2812FX_start();
+    // WS2812FX_start();
+    WS2812FX_resetSegmentRuntime(1); // 重置流星灯所在的段运行时参数
+    WS2812FX_set_running();
 }
 
 //====================================================================================================
@@ -741,7 +745,7 @@ void ls_meteor_stat_effect(void)
                 WHITE,                    // 颜色
                 fc_effect.star_speed,     // 速度
                 fade_type[0] | 0);        // 选项，这里像素点大小：3 REVERSE决定方向
-            WS2812FX_start();
+            // WS2812FX_start();
         }
         else if (fc_effect.star_index == 2) // 单流星
         {
@@ -754,7 +758,7 @@ void ls_meteor_stat_effect(void)
                 WHITE,                    // 颜色
                 fc_effect.star_speed,     // 速度
                 fade_type[0] | REVERSE);  // 选项，这里像素点大小：3 REVERSE决定方向
-            WS2812FX_start();
+            // WS2812FX_start();
         }
         else if (fc_effect.star_index == 3) // 双流星
         {
@@ -767,7 +771,7 @@ void ls_meteor_stat_effect(void)
                 WHITE,                    // 颜色
                 fc_effect.star_speed,     // 速度
                 fade_type[0] | 0);        // 选项，这里像素点大小：3 REVERSE决定方向
-            WS2812FX_start();
+            // WS2812FX_start();
         }
         else if (fc_effect.star_index == 4) // 双流星
         {
@@ -780,7 +784,7 @@ void ls_meteor_stat_effect(void)
                 WHITE,                    // 颜色
                 fc_effect.star_speed,     // 速度
                 fade_type[0] | REVERSE);  // 选项，这里像素点大小：3 REVERSE决定方向
-            WS2812FX_start();
+            // WS2812FX_start();
         }
         else if (fc_effect.star_index == 5) // 频闪效果
         {
@@ -793,7 +797,7 @@ void ls_meteor_stat_effect(void)
                 WHITE,                    // 颜色
                 fc_effect.star_speed,     // 速度
                 0);                       // 选项，这里像素点大小：3 REVERSE决定方向
-            WS2812FX_start();
+            // WS2812FX_start();
         }
         else if (fc_effect.star_index == 6) // 频闪效果
         {
@@ -805,7 +809,7 @@ void ls_meteor_stat_effect(void)
                 WHITE,                    // 颜色
                 fc_effect.star_speed,     // 速度
                 REVERSE);                 // 选项，这里像素点大小：3 REVERSE决定方向
-            WS2812FX_start();
+            // WS2812FX_start();
         }
         else if (fc_effect.star_index == 7)
         {
@@ -817,7 +821,7 @@ void ls_meteor_stat_effect(void)
                 WHITE,                    // 颜色
                 fc_effect.star_speed,     // 速度
                 0);                       // 选项，这里像素点大小：3 REVERSE决定方向
-            WS2812FX_start();
+            // WS2812FX_start();
         }
         else if (fc_effect.star_index == 8)
         {
@@ -829,7 +833,7 @@ void ls_meteor_stat_effect(void)
                 WHITE,                // 颜色
                 fc_effect.star_speed, // 速度
                 0);                   // 选项，这里像素点大小：3 REVERSE决定方向
-            WS2812FX_start();
+            // WS2812FX_start();
         }
         else if (fc_effect.star_index == 9) // 堆积
         {
@@ -841,7 +845,7 @@ void ls_meteor_stat_effect(void)
                 WHITE,                    // 颜色
                 fc_effect.star_speed,     // 速度
                 0);                       // 选项，这里像素点大小：3 REVERSE决定方向
-            WS2812FX_start();
+            // WS2812FX_start();
         }
         else if (fc_effect.star_index == 10) // 堆积
         {
@@ -853,7 +857,7 @@ void ls_meteor_stat_effect(void)
                 WHITE,                    // 颜色
                 fc_effect.star_speed,     // 速度
                 REVERSE);                 // 选项，这里像素点大小：3 REVERSE决定方向
-            WS2812FX_start();
+            // WS2812FX_start();
         }
         else if (fc_effect.star_index == 11) // 逐点流水
         {
@@ -865,7 +869,7 @@ void ls_meteor_stat_effect(void)
                 WHITE,                    // 颜色
                 fc_effect.star_speed,     // 速度
                 0);                       // 选项，这里像素点大小：3 REVERSE决定方向
-            WS2812FX_start();
+            // WS2812FX_start();
         }
         else if (fc_effect.star_index == 12) // 逐点流水
         {
@@ -877,7 +881,7 @@ void ls_meteor_stat_effect(void)
                 WHITE,                    // 颜色
                 fc_effect.star_speed,     // 速度
                 REVERSE);                 // 选项，这里像素点大小：3 REVERSE决定方向
-            WS2812FX_start();
+            // WS2812FX_start();
         }
         else if (fc_effect.star_index == 13) // 中心靠拢
         {
@@ -889,7 +893,7 @@ void ls_meteor_stat_effect(void)
                 WHITE,                    // 颜色
                 fc_effect.star_speed,     // 速度
                 fade_type[0] | 0);        // 选项，这里像素点大小：3 REVERSE决定方向
-            WS2812FX_start();
+            // WS2812FX_start();
         }
         else if (fc_effect.star_index == 14) // 中心发撒
         {
@@ -901,7 +905,7 @@ void ls_meteor_stat_effect(void)
                 WHITE,                    // 颜色
                 fc_effect.star_speed,     // 速度
                 fade_type[0] | REVERSE);  // 选项，这里像素点大小：3 REVERSE决定方向
-            WS2812FX_start();
+            // WS2812FX_start();
         }
         else if (fc_effect.star_index == 15) // 追逐流水
         {
@@ -914,7 +918,7 @@ void ls_meteor_stat_effect(void)
                 WHITE,                    // 颜色
                 fc_effect.star_speed,     // 速度
                 0);                       // 选项，这里像素点大小：3 REVERSE决定方向
-            WS2812FX_start();
+            // WS2812FX_start();
         }
         else if (fc_effect.star_index == 16) // 追逐流水
         {
@@ -927,7 +931,7 @@ void ls_meteor_stat_effect(void)
                 WHITE,                    // 颜色
                 fc_effect.star_speed,     // 速度
                 REVERSE);                 // 选项，这里像素点大小：3 REVERSE决定方向
-            WS2812FX_start();
+            // WS2812FX_start();
         }
         else if (fc_effect.star_index == 17) // 音乐律动1
         {
@@ -942,7 +946,7 @@ void ls_meteor_stat_effect(void)
                 fc_effect.star_speed,     // 速度
                 0);                       // 选项，这里像素点大小：3 REVERSE决定方向
 
-            WS2812FX_start();
+            // WS2812FX_start();
         }
         else if (fc_effect.star_index == 18) // 音乐律动2
         {
@@ -957,7 +961,7 @@ void ls_meteor_stat_effect(void)
                 fc_effect.star_speed,     // 速度
                 0);                       // 选项，这里像素点大小：3 REVERSE决定方向
 
-            WS2812FX_start();
+            // WS2812FX_start();
         }
 
         else if (fc_effect.star_index == 19 || fc_effect.star_index == 20 || fc_effect.star_index == 21) //
@@ -968,6 +972,9 @@ void ls_meteor_stat_effect(void)
         {
             double_meteor(); // 双流星
         }
+
+        WS2812FX_resetSegmentRuntime(1); // 重置流星灯所在的段运行时参数
+        WS2812FX_set_running();
     }
     save_user_data_area3(); // 保存参数配置到flash
 }

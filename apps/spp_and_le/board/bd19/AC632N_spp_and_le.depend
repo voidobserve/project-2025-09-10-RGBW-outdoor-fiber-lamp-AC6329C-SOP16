@@ -43493,7 +43493,7 @@
 1719187032 d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\include_lib\driver\cpu\bd19\asm\ledc.h
 	"typedef.h"
 
-1719186950 source:d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\cpu\bd19\ledc_test.c
+1761184300 source:d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\cpu\bd19\ledc_test.c
 	"system/includes.h"
 	"asm/ledc.h"
 	"audio_spectrum.h"
@@ -43804,7 +43804,7 @@
 	"typedef.h"
 	"asm/adc_api.h"
 
-1761114429 d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\rf24g_key\rf24g_key.h
+1761292983 d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\rf24g_key\rf24g_key.h
 	"includes.h"
 
 1757906813 d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\rf24g_key\rf24g_app.h
@@ -45872,10 +45872,10 @@
 	"asm/ledc.h"
 	"asm/gpio.h"
 
-1761111865 d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\one_wire\one_wire.h
+1761293755 d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\one_wire\one_wire.h
 	"system/includes.h"
 
-1761116579 source:d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\led_strip\led_strand_effect.c
+1761294308 source:d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\led_strip\led_strand_effect.c
 	"system/includes.h"
 	"led_strand_effect.h"
 	"WS2812FX.H"
@@ -45898,11 +45898,12 @@
 	"asm/mcpwm.h"
 	"led_strand_effect.h"
 
-1761115702 source:d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\led_strip\led_strip_sys.c
+1761299439 source:d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\led_strip\led_strip_sys.c
 	"led_strip_sys.h"
 	"Adafruit_NeoPixel.H"
 	"led_strand_effect.h"
 	"../../../apps/user_app/protocol/dp_data_tran.h"
+	"../../../apps/user_app/one_wire/one_wire.h"
 
 1719994438 source:d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\led_strip\led_strip_voice.c
 	"led_strip_voice.h"
@@ -45920,12 +45921,12 @@
 1719208267 d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\led_strip\paint_tool.h
 	"led_strip_sys.h"
 
-1719993764 source:d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\one_wire\one_wire.c
+1761293048 source:d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\one_wire\one_wire.c
 	"system/includes.h"
 	"one_wire.h"
 	"led_strand_effect.h"
 
-1761095370 source:d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\protocol\dp_data_tran.c
+1761292626 source:d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\protocol\dp_data_tran.c
 	"cpu.h"
 	"led_strip_sys.h"
 	"paint_tool.h"
@@ -45957,7 +45958,7 @@
 	"WS2812FX.H"
 	"led_strip_sys.h"
 
-1761119782 source:d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\rf24g_key\rf24g_key.c
+1761299218 source:d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\rf24g_key\rf24g_key.c
 	"rf24g_key.h"
 	"../../../apps/user_app/led_strip/led_strand_effect.h"
 	"../../../apps/user_app/save_flash/save_flash.h"
@@ -45986,7 +45987,7 @@
 	<string.h>
 	"led_strip_sys.h"
 
-1761040800 source:d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\ws2812-fx-lib\ws2812fx_c\ws2812fx_effect.c
+1761295364 source:d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\user_app\ws2812-fx-lib\ws2812fx_c\ws2812fx_effect.c
 	"WS2812FX.h"
 	"ws2812fx_tool.h"
 	"Adafruit_NeoPixel.h"
@@ -46002,7 +46003,7 @@
 	<stdlib.h>
 	<string.h>
 
-1761112731 source:d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\spp_and_le\app_main.c
+1761295378 source:d:\a_workst\aworkst\99-以往项目\t--天奕\2025-09-10-天奕-rgbw户外光纤灯-配触摸遥控器（手电筒）-ac6329c-sop16\01-code\project-2025-09-10-rgbw\apps\spp_and_le\app_main.c
 	"system/includes.h"
 	"app_config.h"
 	"app_action.h"
@@ -46015,6 +46016,7 @@
 	"jl_kws/jl_kws_api.h"
 	"debug.h"
 	"../../../apps/user_app/rf24g_key/rf24g_key.h"
+	"../../../apps/user_app/one_wire/one_wire.h"
 	"led_strip_drive.h"
 	"hardware.h"
 

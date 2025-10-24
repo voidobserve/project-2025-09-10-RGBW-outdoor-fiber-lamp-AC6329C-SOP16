@@ -18,8 +18,19 @@ typedef struct
     u8 music_mode;     //音乐律动下的转动模式
 }base_ins_t;
 
+enum
+{
+    MSG_SEQUENCER_NONE = 0x00,
+    MSG_SEQUENCER_ONE_WIRE_SEND_INFO, // 使能单线发送
+};
 
-extern u8 period[6];
+
+extern volatile u16 send_base_ins;
+extern u8 motor_period[6];
+
+u8 is_one_wire_send_end(void);
+void one_wire_send_enable(void);
+void enable_one_wire(void);
 
 // 设置电机周期（设置电机转速）
 void one_wire_set_period(u8 p);

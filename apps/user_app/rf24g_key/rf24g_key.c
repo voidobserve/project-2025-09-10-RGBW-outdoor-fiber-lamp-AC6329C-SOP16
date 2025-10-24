@@ -61,12 +61,20 @@ volatile struct key_driver_para rf24g_scan_para = {
 void rf24g_scan(u8 *recv_buff)
 {
     rf24g_recv_info_t *p = (rf24g_recv_info_t *)recv_buff;
-    // if (p->header1 == RF24G_HEADER_1 && p->header2 == RF24G_HEADER_2)
-    if (p->header1 == 0xDC && p->header2 == 0xDC || (p->header1 == RF24G_HEADER_1 && p->header2 == RF24G_HEADER_2)) // 测试时使用
+    if (p->header1 == RF24G_HEADER_1 && p->header2 == RF24G_HEADER_2)
+    // if (p->header1 == 0xDC && p->header2 == 0xDC || (p->header1 == RF24G_HEADER_1 && p->header2 == RF24G_HEADER_2)) // 测试时使用
     {
-        printf_buf(recv_buff, sizeof(rf24g_recv_info_t)); // 打印接收到的数据包
+        // printf_buf(recv_buff, sizeof(rf24g_recv_info_t)); // 打印接收到的数据包
 
         // rf24g_recv_info = *p; // 结构体变量赋值
+
+        // 测试时使用：
+        // if (p->header1 == 0xDC && p->header2 == 0xDC)
+        // {
+        //     rf24g_key_val = p->red_val;
+        //     rf24g_rx_flag = 1;
+        //     return;
+        // }
 
         if (p->key_1 == RF24G_KEY_CHROMATIC_CIRCLE) // 如果是色环按键
         {
@@ -78,7 +86,7 @@ void rf24g_scan(u8 *recv_buff)
             rf24g_key_val = p->key_2;
         }
 
-        rf24g_rx_flag = 1;
+        rf24g_rx_flag = 1; // 测试的时候，屏蔽2.4G遥控器按键
     }
 }
 
@@ -92,35 +100,26 @@ static u8 rf24g_get_key_value(void)
     {
         rf24g_rx_flag = 0;
 
-        // if (rf24g_recv_info.header1 == RF24G_HEADER_1 &&
-        //     rf24g_recv_info.header2 == RF24G_HEADER_2)
+        key_value = rf24g_key_val;
+
+        // printf("__LINE__ %u", __LINE__);
+
+        if (RF24G_KEY_CHROMATIC_CIRCLE != key_value) // 收到一次色环的键值就处理一次，不用等超时
         {
-            // if (rf24g_recv_info.key_1 == RF24G_KEY_CHROMATIC_CIRCLE)
-            // {
-            //     // 如果是色环按键
-            //     chromatic_circle_val = rf24g_recv_info.key_2; // 获取色环对应的数值
-            //     key_value = rf24g_recv_info.key_1;            // 存放键值
-            // }
-            // else
-            // {
-            //     // 如果是其他按键
-            //     key_value = rf24g_recv_info.key_2; // 存放键值
-            // }
-            key_value = rf24g_key_val;
-
-            // printf("__LINE__ %u", __LINE__);
-
-            if (RF24G_KEY_CHROMATIC_CIRCLE != key_value) // 收到一次色环的键值就处理一次，不用等超时
-            {
-                // time_out_cnt = 30; // 2.4G接收可能会丢失100~200ms的数据包（响应会慢一些）
-                time_out_cnt = 20; // 2.4G接收可能会丢失100~200ms的数据包（响应会慢一些）
-            }
-
-            last_key_value = key_value;
-
-            // rf24g_recv_info.key_v = NO_KEY;
-            return last_key_value;
+            // time_out_cnt = 30; // 2.4G接收可能会丢失100~200ms的数据包（响应会慢一些）
+            time_out_cnt = 20; // 2.4G接收可能会丢失100~200ms的数据包（响应会慢一些）
+            // time_out_cnt = 10; // 2.4G接收可能会丢失100~200ms的数据包（响应会慢一些）
         }
+
+        if (0x52 == key_value) // 如果键值是0x52，可能是803接收数据时丢失数据包，认为这个键值还是上一次收到的键值
+        {
+            key_value = last_key_value;
+        }
+
+        last_key_value = key_value;
+
+        // rf24g_recv_info.key_v = NO_KEY;
+        return last_key_value;
     }
 
     if (time_out_cnt != 0)
@@ -199,15 +198,19 @@ void rf24_key_handle(void)
     {
         printf("key event on/off click\n");
         // read_flash_device_status_init(); // 读取设备状态（目前应该不用加这一句）
-        soft_turn_on_the_light();
+        soft_turn_on_the_light(); // 在测试时屏蔽
     }
     break;
     case RF24G_KEY_EVENT_ON_OFF_HOLD: // 长按 -- 关机
     {
         printf("key event on/off hold\n");
-        soft_turn_off_lights();
+        soft_turn_off_lights(); // 在测试时屏蔽
     }
     break;
+    case RF24G_KEY_EVENT_ON_OFF_LOOSE:
+        printf("key event on/off loose\n");
+        break;
+
     // 色环按键的短按和长按，都是执行相同的功能
     case RF24G_KEY_EVENT_CHROMATIC_CIRCLE_CLICK:
     case RF24G_KEY_EVENT_CHROMATIC_CIRCLE_HOLD:
@@ -221,6 +224,14 @@ void rf24_key_handle(void)
         u8 g;
         u8 b;
         extern const u8 chromatic_circle_table[][3];
+
+        if (0x51 == chromatic_circle_val )
+        {
+            // 如果收到了0x51，可能是803接收触摸ic传过来的数据丢失了，这里选择屏蔽这个数据
+            return; 
+        }
+        
+
         r = chromatic_circle_table[chromatic_circle_val][0];
         g = chromatic_circle_table[chromatic_circle_val][1];
         b = chromatic_circle_table[chromatic_circle_val][2];
@@ -233,7 +244,7 @@ void rf24_key_handle(void)
         // set_static_mode(r, g, b);
         set_fc_effect(); // 效果调度
 
-        // 这里可能要一段时间无操作后再写入flash：（实际测试，频繁调节色环不会造成卡顿）
+        // 这里可能要一段时间无操作后再写入flash：（实际测试，频繁调节色环时，同时频繁写入flash，不会造成卡顿）
         save_user_data_area3();
 #if 0
         fc_effect.Now_state = COLORFUL_LIGHTS_STATIC;
@@ -272,6 +283,22 @@ void rf24_key_handle(void)
     }
     break;
 
+#if 0 // 测试能不能检测长短按
+
+    case RF24G_KEY_EVENT_BRIGHTNESS_ADD_CLICK: // 亮度加
+        printf("key event brightness add click\n");
+        break;
+    case RF24G_KEY_EVENT_BRIGHTNESS_ADD_HOLD:
+    {
+        printf("key event brightness add hold\n");
+    }
+    break;
+    case RF24G_KEY_EVENT_BRIGHTNESS_ADD_LOOSE: //
+        printf("key event brightness sub click\n");
+        break;
+
+#endif // 测试能不能检测长短按
+
     case RF24G_KEY_EVENT_BRIGHTNESS_SUB_CLICK: // 亮度减
     case RF24G_KEY_EVENT_BRIGHTNESS_SUB_HOLD:
     {
@@ -282,24 +309,27 @@ void rf24_key_handle(void)
     break;
 
     case RF24G_KEY_EVENT_DYNAMIC_SPEED_ADD_CLICK: // 动态速度加
-        // case RF24G_KEY_EVENT_DYNAMIC_SPEED_ADD_HOLD:
-        {
-            // 目前只有在动态模式下，才加快速度
-            ls_add_speed();
-            save_user_data_area3();
-        }
-        break;
+                                                  // case RF24G_KEY_EVENT_DYNAMIC_SPEED_ADD_HOLD:
+    case RF24G_KEY_EVENT_DYNAMIC_SPEED_ADD_LOOSE:
+    {
+        // 目前只有在动态模式下，才加快速度
+        ls_add_speed();
+        save_user_data_area3();
+    }
+    break;
 
     case RF24G_KEY_EVENT_DYNAMIC_SPEED_SUB_CLICK: // 动态速度减
-        // case RF24G_KEY_EVENT_DYNAMIC_SPEED_SUB_HOLD:
-        {
-            // 目前只有在动态模式下，才减慢速度
-            ls_sub_speed();
-            save_user_data_area3();
-        }
-        break;
+                                                  // case RF24G_KEY_EVENT_DYNAMIC_SPEED_SUB_HOLD:
+    case RF24G_KEY_EVENT_DYNAMIC_SPEED_SUB_LOOSE:
+    {
+        // 目前只有在动态模式下，才减慢速度
+        ls_sub_speed();
+        save_user_data_area3();
+    }
+    break;
 
     case RF24G_KEY_EVENT_MODE_ADD_CLICK: // 模式加
+    case RF24G_KEY_EVENT_MODE_ADD_LOOSE:
     {
         // USER_TO_DO 需要加上流星灯模式的切换
         ls_add_mode_InAPP();
@@ -308,6 +338,7 @@ void rf24_key_handle(void)
     break;
 
     case RF24G_KEY_EVENT_MODE_SUB_CLICK: // 模式减
+    case RF24G_KEY_EVENT_MODE_SUB_LOOSE:
     {
         // USER_TO_DO 需要加上流星灯模式的切换
         ls_sub_mode_InAPP();
@@ -427,6 +458,7 @@ void rf24_key_handle(void)
     break;
 
     case RF24G_KEY_EVENT_MOTOR_SPEED_ADD_CLICK: // 电机速度加
+    case RF24G_KEY_EVENT_MOTOR_SPEED_ADD_LOOSE:
     {
         ls_add_motor_speed();
         save_user_data_area3();
@@ -434,6 +466,7 @@ void rf24_key_handle(void)
     break;
 
     case RF24G_KEY_EVENT_MOTOR_SPEED_SUB_CLICK: // 电机速度减
+    case RF24G_KEY_EVENT_MOTOR_SPEED_SUB_LOOSE:
     {
         ls_sub_motor_speed();
         save_user_data_area3();
@@ -441,6 +474,7 @@ void rf24_key_handle(void)
     break;
 
     case RF24G_KEY_EVENT_METEOR_SPEED_ADD_CLICK: // 流星灯速度加
+    case RF24G_KEY_EVENT_METEOR_SPEED_ADD_LOOSE:
     {
         // 流星灯开启时，才调节速度：
         ls_add_star_speed();
@@ -452,6 +486,7 @@ void rf24_key_handle(void)
     break;
 
     case RF24G_KEY_EVENT_METEOR_SPEED_SUB_CLICK: // 流星灯速度减
+    case RF24G_KEY_EVENT_METEOR_SPEED_SUB_LOOSE:
     {
         // 流星灯开启时，才调节速度：
         ls_sub_star_speed();
