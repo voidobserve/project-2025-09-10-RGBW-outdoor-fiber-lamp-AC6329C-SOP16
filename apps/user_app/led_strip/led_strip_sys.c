@@ -81,58 +81,73 @@ static u8 tk = 0;
 void soft_turn_on_the_light(void) // 软开灯处理
 {
     // if (DEVICE_OFF == fc_effect.on_off_flag)
+    // {
+    fc_effect.on_off_flag = DEVICE_ON;
+
+#if 0
+    // 开机前，可能关机前电机就开着，或者关机前电机就已经关了，开机后保持状态不变（开机后，恢复电机在关机前的状态）
+    if (fc_effect.star_speed_index >= ARRAY_SIZE(motor_period))
     {
-        fc_effect.on_off_flag = DEVICE_ON;
-
-        // OpenMortor(); // 给对应标志位置位，表示电机打开
-
-        // 开机前，可能关机前电机就开着，或者关机前电机就已经关了，开机后保持状态不变（开机后，恢复电机在关机前的状态）
-        if (fc_effect.star_speed_index >= ARRAY_SIZE(motor_period))
-        {
-            // 如果开机前，电机的周期索引超过了电机的周期数组大小，说明电机在开机前就是关着的
-            one_wire_set_mode(6); // 关闭电机
-            fc_effect.motor_on_off = DEVICE_OFF;
-        }
-        else
-        {
-            // 如果开机前，电机的周期索引还在电机的周期数组大小内，说明电机在开机前是开着的
-            one_wire_set_period(motor_period[fc_effect.star_speed_index]);
-            one_wire_set_mode(4); // 360正转
-            fc_effect.motor_on_off = DEVICE_ON;
-        }
-        
-        os_taskq_post("msg_task", 1, MSG_SEQUENCER_ONE_WIRE_SEND_INFO);
-
-
-        motor_Init();     // 初始化电机相关的变量
-        WS2812FX_start(); // 清空动画使用到的缓存，给运行标志位置位
-        // open_fan();
-        set_fc_effect();         // 七彩灯动画效果设置
-        ls_meteor_stat_effect(); // 流星灯动画效果设置 这个函数里面会写入一次flash
-        fb_led_on_off_state();   // 与app同步开关状态
-        save_user_data_area3();  // 保存参数配置到flash
-
-        printf("soft_turn_on_the_light\n");
+        // 如果开机前，电机的周期索引超过了电机的周期数组大小，说明电机在开机前就是关着的
+        one_wire_set_mode(6); // 关闭电机
+        fc_effect.motor_on_off = DEVICE_OFF;
+        fc_effect.last_motor_on_off_state = DEVICE_OFF;
     }
+    else
+    {
+        // 如果开机前，电机的周期索引还在电机的周期数组大小内，说明电机在开机前是开着的
+        one_wire_set_period(motor_period[fc_effect.star_speed_index]);
+        // one_wire_set_mode(4); // 360正转
+        fc_effect.motor_on_off = DEVICE_ON;
+        fc_effect.last_motor_on_off_state = DEVICE_ON;
+    }
+#endif
+
+    if (DEVICE_ON == fc_effect.motor_on_off)
+    {
+        // 如果在开机前，电机是开着的，则恢复电机在开机前的状态
+        if (6 == fc_effect.base_ins.mode)
+        {
+            // 如果电机的模式是6（关闭），则改为4
+            fc_effect.base_ins.mode = 4;
+        }
+    }
+
+    os_taskq_post("msg_task", 1, MSG_SEQUENCER_ONE_WIRE_SEND_INFO);
+
+    motor_Init();     // 初始化电机相关的变量
+    WS2812FX_start(); // 清空动画使用到的缓存，给运行标志位置位
+    // open_fan();
+    set_fc_effect();         // 七彩灯动画效果设置
+    ls_meteor_stat_effect(); // 流星灯动画效果设置 这个函数里面会写入一次flash
+    fb_led_on_off_state();   // 与app同步开关状态
+    save_user_data_area3();  // 保存参数配置到flash
+
+    printf("soft_turn_on_the_light\n");
+    // }
 }
 
 void CloseMotor(void);
 void soft_turn_off_lights(void) // 软关灯处理
 {
-    if (fc_effect.on_off_flag == DEVICE_ON)
-    {
-        fc_effect.on_off_flag = DEVICE_OFF;
+    // if (fc_effect.on_off_flag == DEVICE_ON)
+    // {
+    fc_effect.on_off_flag = DEVICE_OFF;
 
-        CloseMotor();
+    // CloseMotor();
+    // 改成只发送关闭电机的控制命令，不给 fc_effect.motor_on_off 赋值为 DEVICE_OFF
+    one_wire_set_period(motor_period[fc_effect.star_speed_index]);
+    one_wire_set_mode(0x06); // 关闭电机
+    os_taskq_post("msg_task", 1, MSG_SEQUENCER_ONE_WIRE_SEND_INFO);
 
-        WS2812FX_stop();
-        WS2812FX_strip_off(); // 清空缓存
-        // close_fan();
-        fb_led_on_off_state();  // 与app同步设备的开关状态
-        save_user_data_area3(); // 保存参数配置到flash
+    WS2812FX_stop();
+    WS2812FX_strip_off(); // 清空缓存
+    // close_fan();
+    fb_led_on_off_state();  // 与app同步设备的开关状态
+    save_user_data_area3(); // 保存参数配置到flash
 
-        printf("soft_turn_off_lights\n");
-    }
+    printf("soft_turn_off_lights\n");
+    // }
 }
 
 /*********************************************************
@@ -744,41 +759,6 @@ void ls_set_star_tail(void)
  *********************************************************/
 extern u8 motor_period[6];
 
-#if 0 // 未使用
-// void ls_set_motor_speed(void)
-// {
-//     static u8 start = 1;
-//     if (fc_effect.star_speed_index < 6)
-//     {
-//         if (start)
-//         {
-//             start = 0;
-//             one_wire_set_mode(4); // 360正转
-//             enable_one_wire();
-//             fc_effect.motor_on_off = DEVICE_ON;
-//         }
-//         else
-//         {
-
-//             one_wire_set_period(motor_period[fc_effect.star_speed_index]);
-//             enable_one_wire();
-//         }
-//     }
-//     else
-//     {
-//         start = 1;
-//         fc_effect.motor_on_off = DEVICE_OFF;
-//         one_wire_set_period(motor_period[fc_effect.star_speed_index]);
-//         one_wire_set_mode(6); // 关闭电机
-//         enable_one_wire();    // 启动发送电机数据
-//     }
-
-//     fc_effect.star_speed_index++;
-//     if (fc_effect.star_speed_index >= 7)
-//         fc_effect.star_speed_index = 0;
-// }
-#endif
-
 void ls_add_motor_speed(void)
 {
     // 目前是索引值越小，电机转速越快
@@ -815,10 +795,12 @@ void CloseMotor(void)
     // enable_one_wire();       // 启动发送电机数据
 }
 
+//
 // u8 mo_cnt = 3;
 void OpenMortor(void)
 {
-    fc_effect.motor_on_off = DEVICE_ON;
+    // fc_effect.motor_on_off = DEVICE_ON;
+
     // mo_cnt = 3;
 }
 

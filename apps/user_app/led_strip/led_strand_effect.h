@@ -153,8 +153,11 @@ typedef struct
     music_t music; // 音乐效果
 
     unsigned char auto_f;
+
     base_ins_t base_ins; // 电机
+    // u8 last_motor_on_off_state; // 记录在上次通电期间，电机的状态
     unsigned char motor_on_off;
+
     unsigned char star_on_off; // 流星开关
     unsigned char star_index;
     unsigned short star_speed;      // 流星灯动画的速度值

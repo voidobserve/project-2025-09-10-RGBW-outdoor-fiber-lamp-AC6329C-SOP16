@@ -361,6 +361,9 @@ __initcall(user_timer_init);
 void main_while(void)
 {
 
+    read_flash_device_status_init();
+    full_color_init();
+
     while (1)
     {
         effect_stepmotor(); // 声控，电机的音乐效果
@@ -422,7 +425,7 @@ void user_msg_handle_task(void)
                     os_time_dly(1);
                 }
 
-                enable_one_wire(); 
+                enable_one_wire();
             }
         }
         break;
@@ -449,11 +452,15 @@ void my_main(void)
     led_state_init(); // 流星灯
     mcu_com_init();   // 电机一线通信
 
-    read_flash_device_status_init();
-    full_color_init();
     // os_sem_create(&LED_TASK_SEM, 0);
-    task_create(main_while, NULL, "led_task");
+
     task_create(user_msg_handle_task, NULL, "msg_task");
 
     sys_s_hi_timer_add(NULL, WS2812_circle_task, 10); // 10ms
+
+    /*
+        这里要放到最后，防止调用 soft_turn_on_the_light() 给线程发送消息时，
+        接收消息的线程没有创建，导致收不到消息，最后一上电电机工作的模式和速度与变量的不一致
+    */
+    task_create(main_while, NULL, "led_task");
 }
